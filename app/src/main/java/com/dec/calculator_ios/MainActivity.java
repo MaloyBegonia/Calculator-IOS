@@ -151,6 +151,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // Иначе, выводим результат как строку
                     resultTv.setText(result);
                 }
+                // Проверяем, равен ли знаменатель нулю
+                if (result.equals("0") && expression.endsWith("/0")) {
+                    resultTv.setText("Ошибка: На 0 делить нельзя");
+                }
             }
         }
     }
@@ -185,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String dataToCalculate = solutionTv.getText().toString();
         if (!dataToCalculate.isEmpty() && !dataToCalculate.contains(".")) {
             solutionTv.setText(dataToCalculate + ".");
-            isLastInputNumeric = false;
+            isLastInputNumeric = true; // Теперь последний введенный символ - числовой
         }
     }
 
