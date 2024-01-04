@@ -134,14 +134,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void appendToDisplay(String text) {
         String currentText = solutionTv.getText().toString();
+        if (currentText.isEmpty() && !Character.isDigit(text.charAt(0))) {
+            return; // Запрет ввода всех символов, кроме чисел, если текущий текст пуст
+        }
         if (!currentText.isEmpty() && isOperator(text) && isOperator(Character.toString(currentText.charAt(currentText.length() - 1)))) {
             return;
         }
-        if (isOperator(text) && currentText.equals("")) {
-            return;
-        }
         solutionTv.setText(currentText + text);
-        isLastInputNumeric = !isOperator(text);
+        isLastInputNumeric = !isOperator(text) && !text.equals("(") && !text.equals(")");
         displayResult();
     }
 
