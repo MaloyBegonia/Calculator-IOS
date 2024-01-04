@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.maloy.calculator_ios",
+  "applicationId": "com.dec.calculator_ios",
   "variantName": "release",
   "elements": [
     {
