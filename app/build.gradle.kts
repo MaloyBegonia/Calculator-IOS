@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.dec.calculator_ios"
+    namespace = "com.maloy.calculator_ios"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.dec.calculator_ios"
+        applicationId = "com.maloy.calculator_ios"
         minSdk = 30
         targetSdk = 33
         versionCode = 2

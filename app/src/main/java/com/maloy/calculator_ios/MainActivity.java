@@ -1,4 +1,4 @@
-package com.dec.calculator_ios;
+package com.maloy.calculator_ios;
 
 import android.content.Context;
 import android.os.Bundle;
