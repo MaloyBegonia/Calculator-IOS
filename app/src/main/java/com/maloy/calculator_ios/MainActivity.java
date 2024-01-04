@@ -1,16 +1,18 @@
-
 package com.maloy.calculator_ios;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Context;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.button.MaterialButton;
-import org.mozilla.javascript.Context;
+
 import org.mozilla.javascript.Scriptable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -63,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (button != null) {
             String buttonText = button.getText().toString();
 
+            // Добавляем вибрацию при нажатии кнопки
+            vibrate();
+
             switch (buttonText) {
                 case "AC":
                     clearDisplay();
@@ -77,6 +82,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     updateDisplayWith(buttonText);
                     break;
             }
+        }
+    }
+
+    private void vibrate() {
+        // Получаем доступ к сервису вибрации
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator != null) {
+            // Создаем вибрацию
+            VibrationEffect effect = VibrationEffect.createOneShot(20, VibrationEffect.DEFAULT_AMPLITUDE);
+            // Запускаем вибрацию
+            vibrator.vibrate(effect);
         }
     }
 
@@ -102,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (isValidInput(buttonText)) {
             String dataToCalculate = solutionTv.getText().toString() + buttonText;
             solutionTv.setText(dataToCalculate);
-            // Auto-calculate the result on input
             String calculatedResult = getResult(dataToCalculate);
             if (!calculatedResult.equals("Ошибка вычисления")) {
                 resultTv.setText(calculatedResult);
@@ -112,17 +127,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     String getResult(String data) {
         try {
-            Context context = Context.enter();
+            // Создаем и входим в новый контекст Rhino
+            org.mozilla.javascript.Context context = org.mozilla.javascript.Context.enter();
+            // Отключаем оптимизацию для совместимости с Android
             context.setOptimizationLevel(-1);
+            // Инициализируем стандартные объекты Rhino
             Scriptable scriptable = context.initStandardObjects();
-            String finalResult = context.evaluateString(scriptable, data, "Javascript", 1, null).toString();
+            // Выполняем скрипт и получаем результат
+            String finalResult = context.evaluateString(scriptable, data, "JavaScript", 1, null).toString();
+            // Удаляем окончание ".0" для целых чисел
             if (finalResult.endsWith(".0")) {
                 finalResult = finalResult.replace(".0", "");
             }
             return finalResult;
         } catch (Exception e) {
+            // Логируем ошибку
             Log.e("CalculatorError", "Ошибка при вычислении: ", e);
             return "Ошибка вычисления";
+        } finally {
+            // Выходим из контекста Rhino
+            org.mozilla.javascript.Context.exit();
         }
     }
 
