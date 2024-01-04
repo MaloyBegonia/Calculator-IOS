@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     MaterialButton button0, button1, button2, button3, button4, button5, button6, button7, button8, button9;
     MaterialButton buttonAC, buttonDot;
 
+    boolean isLastInputNumeric = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,8 +80,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case "C":
                     removeLastCharacter();
                     break;
+                case "+":
+                case "-":
+                case "*":
+                case "/":
+                    // Обработка операторов +, -, *, /
+                    if (isLastInputNumeric) {
+                        // Если последний символ был числом, добавляем оператор к выражению
+                        appendToDisplay(buttonText);
+                    }
+                    break;
+                case "0":
+                case "1":
+                case "2":
+                case "3":
+                case "4":
+                case "5":
+                case "6":
+                case "7":
+                case "8":
+                case "9":
+                    appendToDisplay(buttonText);
+                    break;
+                case ".":
+                    appendDecimalPoint();
+                    break;
                 default:
-                    updateDisplayWith(buttonText);
+                    // Неизвестный символ, игнорируем
                     break;
             }
         }
@@ -90,7 +117,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator != null) {
             // Создаем вибрацию
-            VibrationEffect effect = VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE);
+            final int VIBRATION_DURATION_MS = 10; // Добавляем константу для длительности вибрации
+            VibrationEffect effect = VibrationEffect.createOneShot(VIBRATION_DURATION_MS, VibrationEffect.DEFAULT_AMPLITUDE);
             // Запускаем вибрацию
             vibrator.vibrate(effect);
         }
@@ -99,29 +127,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void clearDisplay() {
         solutionTv.setText("");
         resultTv.setText("0");
+        isLastInputNumeric = false;
     }
 
     private void displayResult() {
         String expression = solutionTv.getText().toString();
-        String result = getResult(expression);
-        resultTv.setText(result);
+        if (!expression.isEmpty()) {
+            String result = getResult(expression);
+            // Добавляем проверку на "Ошибка вычисления" и неполное выражение
+            if (!result.equals("Ошибка вычисления") && !result.equals(expression)) {
+                // Проверяем, был ли последний введенный символ числом перед выводом результата
+                if (isLastInputNumeric) {
+                    // Если последний символ был числом, выводим результат как числовое значение
+                    double numericResult = Double.parseDouble(result);
+                    if (numericResult == (long) numericResult) {
+                        // Если результат является целым числом, конвертируем его в long и выводим без запятой
+                        resultTv.setText(String.valueOf((long) numericResult));
+                    } else {
+                        // В противном случае, выводим результат с десятичной точкой
+                        resultTv.setText(result);
+                    }
+                } else {
+                    // Иначе, выводим результат как строку
+                    resultTv.setText(result);
+                }
+            }
+        }
     }
 
     private void removeLastCharacter() {
         String dataToCalculate = solutionTv.getText().toString();
         if (!dataToCalculate.isEmpty()) {
             solutionTv.setText(dataToCalculate.substring(0, dataToCalculate.length() - 1));
+            // Проверяем, был ли последний введенный символ числом
+            if (isLastInputNumeric && dataToCalculate.length() > 0) {
+                isLastInputNumeric = Character.isDigit(dataToCalculate.charAt(dataToCalculate.length() - 1));
+            } else {
+                isLastInputNumeric = false;
+            }
         }
     }
 
-    private void updateDisplayWith(String buttonText) {
-        if (isValidInput(buttonText)) {
-            String dataToCalculate = solutionTv.getText().toString() + buttonText;
+    private void appendToDisplay(String text) {
+        // Проверяем, был ли последний введенный символ числом
+        if (isLastInputNumeric) {
+            String dataToCalculate = solutionTv.getText().toString() + text;
             solutionTv.setText(dataToCalculate);
-            String calculatedResult = getResult(dataToCalculate);
-            if (!calculatedResult.equals("Ошибка вычисления")) {
-                resultTv.setText(calculatedResult);
-            }
+            // Выполняем автоподсчет после каждого ввода
+            displayResult();
+        } else {
+            solutionTv.setText(text);
+        }
+        isLastInputNumeric = true;
+    }
+
+    private void appendDecimalPoint() {
+        String dataToCalculate = solutionTv.getText().toString();
+        if (!dataToCalculate.isEmpty() && !dataToCalculate.contains(".")) {
+            solutionTv.setText(dataToCalculate + ".");
+            isLastInputNumeric = false;
         }
     }
 
@@ -134,12 +198,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Инициализируем стандартные объекты Rhino
             Scriptable scriptable = context.initStandardObjects();
             // Выполняем скрипт и получаем результат
-            String finalResult = context.evaluateString(scriptable, data, "JavaScript", 1, null).toString();
-            // Удаляем окончание ".0" для целых чисел
-            if (finalResult.endsWith(".0")) {
-                finalResult = finalResult.replace(".0", "");
+            Object result = context.evaluateString(scriptable, data, "JavaScript", 1, null);
+
+            if (result != null) {
+                String finalResult = result.toString();
+                // Удаляем окончание ".0" для целых чисел
+                if (finalResult.endsWith(".0")) {
+                    finalResult = finalResult.replace(".0", "");
+                }
+                return finalResult;
+            } else {
+                return "Ошибка вычисления";
             }
-            return finalResult;
         } catch (Exception e) {
             // Логируем ошибку
             Log.e("CalculatorError", "Ошибка при вычислении: ", e);
@@ -148,11 +218,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Выходим из контекста Rhino
             org.mozilla.javascript.Context.exit();
         }
-    }
-
-    private boolean isValidInput(String data) {
-        // Реализация проверки на валидность ввода (например, регулярные выражения)
-        return true;
     }
 
     public void buttonClicked(View view) {
