@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator != null) {
             // Создаем вибрацию
-            VibrationEffect effect = VibrationEffect.createOneShot(20, VibrationEffect.DEFAULT_AMPLITUDE);
+            VibrationEffect effect = VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE);
             // Запускаем вибрацию
             vibrator.vibrate(effect);
         }
