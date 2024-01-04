@@ -102,6 +102,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (isValidInput(buttonText)) {
             String dataToCalculate = solutionTv.getText().toString() + buttonText;
             solutionTv.setText(dataToCalculate);
+            // Auto-calculate the result on input
+            String calculatedResult = getResult(dataToCalculate);
+            if (!calculatedResult.equals("Ошибка вычисления")) {
+                resultTv.setText(calculatedResult);
+            }
         }
     }
 
