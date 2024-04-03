@@ -34,16 +34,6 @@
         android:textColor="@color/white"
         android:textSize="64sp" />
 
-    <ImageButton
-        android:id="@+id/settingsButton"
-        android:layout_width="90dp"
-        android:background="@color/monetblack"
-        android:layout_height="90dp"
-        android:scaleType="fitXY"
-        android:onClick="buttonClicked"
-        android:src="@drawable/about" />
-
-
     <LinearLayout
         android:id="@+id/buttons_layout"
         android:layout_width="match_parent"

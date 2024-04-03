@@ -1,4 +1,4 @@
-package com.maloy.calculator_ios;
+package com.maloy.calculator;
 
 import org.junit.Test;
 

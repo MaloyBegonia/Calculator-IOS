@@ -3,15 +3,15 @@ plugins {
 }
 
 android {
-    namespace = "com.maloy.calculator_ios"
-    compileSdk = 33
+    namespace = "com.maloy.calculator"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.maloy.calculator_ios"
+        applicationId = "com.maloy.calculator"
         minSdk = 30
         targetSdk = 33
         versionCode = 2
-        versionName = "1.2"
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -26,15 +26,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_9
+        targetCompatibility = JavaVersion.VERSION_1_9
     }
 }
 
 dependencies {
 
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.faendir.rhino:rhino-android:1.5.2")
     testImplementation("junit:junit:4.13.2")

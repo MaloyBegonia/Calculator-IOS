@@ -1,4 +1,4 @@
-package com.maloy.calculator_ios;
+package com.maloy.calculator;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -170,12 +170,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } finally {
             org.mozilla.javascript.Context.exit();
         }
-    }
-
-    public void buttonClicked(View view) {
-        Toast myToast = Toast.makeText(getApplicationContext(),
-                "Author @MaloyBegonia",
-                Toast.LENGTH_LONG);
-        myToast.show();
     }
 }
